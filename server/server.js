@@ -6,16 +6,27 @@ const http = require("http");
 
 const port = process.env.PORT || 3000;
 var app =express();
-var server = http.createServer(app); 
-var io = socketIO(server);
-
 app.use(express.static(publicPath));
+
+//create a server
+var server = http.createServer(app); 
+//create a io
+var io = socketIO(server);
 
 io.on("connection",(socket)=>{
     console.log("new user connected");
     socket.on("disconnect",()=>{
         console.log("User was disconnected");
-    });
+    });  
+
+    socket.on("createMessage",function(message){ 
+        socket.emit("newMessage",{
+            from:message.from,
+            text:message.text,
+            createAt:new Date().getTime()
+        });
+    }); 
+    
 })
 
 server.listen(port,()=>{
